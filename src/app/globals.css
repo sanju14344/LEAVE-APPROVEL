@@ -1,26 +1,272 @@
 @import "tailwindcss";
 
-:root {
-  --background: #0d0d0d;
-  --foreground: #f1f1f1;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Base Colors - Zinc Dark Theme */
+  --background: #09090b;
+  --foreground: #fafafa;
+
+  --card: #09090b;
+  --card-foreground: #fafafa;
+
+  --popover: #09090b;
+  --popover-foreground: #fafafa;
+
+  --primary: #fafafa;
+  --primary-foreground: #18181b;
+
+  --secondary: #27272a;
+  --secondary-foreground: #fafafa;
+
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fafafa;
+
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #d4d4d8;
+
+  --radius: 0.5rem;
+
+  /* Stream Colors */
+  --stream-cse-from: #3b82f6;
+  --stream-cse-to: #1d4ed8;
+  --stream-ece-from: #a855f7;
+  --stream-ece-to: #7c3aed;
+  --stream-eee-from: #f59e0b;
+  --stream-eee-to: #d97706;
+  --stream-mech-from: #ef4444;
+  --stream-mech-to: #dc2626;
+  --stream-civil-from: #10b981;
+  --stream-civil-to: #059669;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Glassmorphism Utilities - Refined */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-strong {
+  background: rgba(9, 9, 11, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+}
+
+/* Smooth Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardPulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-stagger-in {
+  animation: staggerFadeIn 0.6s ease-out backwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Stream Gradient Backgrounds */
+.stream-gradient-cse {
+  background: linear-gradient(135deg, var(--stream-cse-from), var(--stream-cse-to));
+}
+
+.stream-gradient-ece {
+  background: linear-gradient(135deg, var(--stream-ece-from), var(--stream-ece-to));
+}
+
+.stream-gradient-eee {
+  background: linear-gradient(135deg, var(--stream-eee-from), var(--stream-eee-to));
+}
+
+.stream-gradient-mech {
+  background: linear-gradient(135deg, var(--stream-mech-from), var(--stream-mech-to));
+}
+
+.stream-gradient-civil {
+  background: linear-gradient(135deg, var(--stream-civil-from), var(--stream-civil-to));
+}
+
+/* Modern Shadows */
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+.shadow-glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.shadow-glow-green {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.shadow-glow-amber {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+}
+
+/* Enhanced Card Hover Effects */
+@keyframes borderGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(var(--border-color), 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(var(--border-color), 0.6);
+  }
+}
+
+.card-hover-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Smooth Transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }

@@ -2,171 +2,236 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import StatusBadge from "@/components/StatusBadge";
+import { UsersIcon, UserIcon, BriefcaseIcon, FileTextIcon } from "@/components/icons";
+
+type Stream = "CSE" | "ECE" | "EEE" | "MECH" | "CIVIL";
+type LeaveStatus = "pending_pc" | "pending_admin" | "approved" | "declined";
 
 type LeaveRequest = {
   id: string;
   student_name: string;
-  student_class: string;
-  from_date: string;
-  to_date: string;
-  reason: string | null;
-  attachment_url?: string | null;
-  status: string;
+  status: LeaveStatus;
   created_at: string;
-  reviewed_at: string | null;
 };
 
-export default function AdminPage() {
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+};
+
+export default function AdminOverview() {
   const router = useRouter();
-  const [requests, setRequests] = useState<LeaveRequest[]>([]);
+  const [userStream, setUserStream] = useState<Stream | null>(null);
+  const [userName, setUserName] = useState<string>("");
+  const [stats, setStats] = useState({
+    totalRequests: 0,
+    pendingPC: 0,
+    pendingAdmin: 0,
+    approved: 0,
+    declined: 0,
+    totalUsers: 0,
+    totalStaff: 0,
+    totalPC: 0,
+  });
+  const [recentRequests, setRecentRequests] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.auth.getUser();
       const user = data.user;
+
       if (!user) {
         router.replace("/login");
         return;
       }
-      const metaRole = (user.user_metadata as any)?.role;
-      if (metaRole !== "admin") {
-        if (metaRole === "staff") router.replace("/staff");
-        else router.replace("/login");
-        return;
-      }
-      const { data: rows, error: queryError } = await supabase
+
+      const metaStream = (user.user_metadata as any)?.stream as Stream;
+      setUserStream(metaStream || "CSE");
+      setUserName(user.user_metadata?.full_name || user.email?.split('@')[0] || 'User');
+
+      // Fetch leave requests statistics
+      const { data: requests } = await supabase
         .from("leave_requests")
-        .select("id, student_name, student_class, from_date, to_date, reason, attachment_url, status, created_at, reviewed_at")
+        .select("id, student_name, status, created_at")
+        .eq("stream", metaStream || "CSE")
         .order("created_at", { ascending: false });
-      if (queryError) {
-        setError(queryError.message);
-        setLoading(false);
-        return;
+
+      if (requests) {
+        setStats({
+          totalRequests: requests.length,
+          pendingPC: requests.filter(r => r.status === "pending_pc").length,
+          pendingAdmin: requests.filter(r => r.status === "pending_admin").length,
+          approved: requests.filter(r => r.status === "approved").length,
+          declined: requests.filter(r => r.status === "declined").length,
+          totalUsers: 0, // Will be updated from profiles
+          totalStaff: 0,
+          totalPC: 0,
+        });
+        setRecentRequests(requests.slice(0, 5));
       }
-      setRequests(rows ?? []);
+
+      // Fetch user statistics
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, role")
+        .eq("stream", metaStream || "CSE");
+
+      if (profiles) {
+        setStats(prev => ({
+          ...prev,
+          totalUsers: profiles.length,
+          totalStaff: profiles.filter(p => p.role === "staff").length,
+          totalPC: profiles.filter(p => p.role === "pc").length,
+        }));
+      }
+
       setLoading(false);
     };
+
     load();
   }, [router]);
 
-  const updateStatus = async (id: string, status: "approved" | "declined") => {
-    setError(null);
-    const { data } = await supabase.auth.getUser();
-    const user = data.user;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-    const { error: updateError } = await supabase
-      .from("leave_requests")
-      .update({
-        status,
-        reviewed_by: user.id,
-        reviewed_at: new Date().toISOString(),
-      })
-      .eq("id", id);
-    if (updateError) {
-      setError(updateError.message);
-      return;
-    }
-    const { data: rows } = await supabase
-      .from("leave_requests")
-      .select("id, student_name, student_class, from_date, to_date, reason, status, created_at, reviewed_at")
-      .order("created_at", { ascending: false });
-    setRequests(rows ?? []);
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.replace("/login");
-  };
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading overview...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-neutral-900 px-4 py-8">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-neutral-100">Admin dashboard</h1>
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="rounded-md bg-purple-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-purple-500"
-          >
-            Sign out
-          </button>
-        </header>
-        <section className="rounded-lg bg-neutral-800 p-6 shadow">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-100">All leave requests</h2>
-          {loading ? (
-            <p className="text-sm text-neutral-400">Loading requests...</p>
-          ) : error ? (
-            <p className="text-sm text-red-600">{error}</p>
-          ) : requests.length === 0 ? (
-            <p className="text-sm text-neutral-400">No leave requests found.</p>
+    <div className="min-h-screen bg-background p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-fade-in">
+        {/* Header */}
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard Overview</h1>
+          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+            {getGreeting()}, <span className="font-semibold bg-gradient-to-r from-primary via-purple-500 to-blue-500 bg-clip-text text-transparent">{userName}</span>! Here's what's happening in your department.
+          </p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-card border border-border rounded-xl p-5 hover:scale-105 transition-all duration-300 shadow-sm animate-stagger-in">
+            <p className="text-xs text-muted-foreground mb-1">Total Requests</p>
+            <p className="text-3xl font-bold text-foreground">{stats.totalRequests}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 hover:scale-105 hover:shadow-glow-blue transition-all duration-300 shadow-sm border-l-4 border-l-blue-500 animate-stagger-in" style={{ animationDelay: '0.05s' }}>
+            <p className="text-xs text-blue-500 mb-1">Pending PC</p>
+            <p className="text-3xl font-bold text-blue-500">{stats.pendingPC}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 hover:scale-105 hover:shadow-glow-amber transition-all duration-300 shadow-sm border-l-4 border-l-amber-500 animate-stagger-in" style={{ animationDelay: '0.1s' }}>
+            <p className="text-xs text-amber-500 mb-1">Pending Admin</p>
+            <p className="text-3xl font-bold text-amber-500">{stats.pendingAdmin}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 hover:scale-105 hover:shadow-glow-green transition-all duration-300 shadow-sm border-l-4 border-l-emerald-500 animate-stagger-in" style={{ animationDelay: '0.15s' }}>
+            <p className="text-xs text-emerald-500 mb-1">Approved</p>
+            <p className="text-3xl font-bold text-emerald-500">{stats.approved}</p>
+          </div>
+        </div>
+
+        {/* User Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 animate-stagger-in" style={{ animationDelay: '0.1s' }}>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Total Users</p>
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <UsersIcon className="text-primary" size={20} />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-foreground">{stats.totalUsers}</p>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 animate-stagger-in" style={{ animationDelay: '0.2s' }}>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Advisors</p>
+              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <UserIcon className="text-blue-500" size={20} />
+              </div>
+            </div>
+            <p className="text-2xl font-bold text-foreground">{stats.totalStaff}</p>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-card border border-border rounded-2xl p-6 shadow-lg">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-foreground">Recent Leave Requests</h2>
+            <Link
+              href="/admin/requests"
+              className="text-sm text-primary hover:text-primary/80 font-medium"
+            >
+              View all →
+            </Link>
+          </div>
+
+          {recentRequests.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No recent requests</p>
+            </div>
           ) : (
-            <ul className="space-y-3 text-sm">
-              {requests.map((request) => (
-                <li
+            <div className="space-y-3">
+              {recentRequests.map((request) => (
+                <div
                   key={request.id}
-                  className="flex flex-col gap-2 rounded-md border border-neutral-600 px-4 py-3 md:flex-row md:items-center md:justify-between"
+                  className="bg-card/50 border border-border/50 rounded-lg p-4 hover:bg-accent/50 transition-all"
                 >
-                  <div>
-                    <p className="font-medium text-neutral-100">
-                      {request.student_name} ({request.student_class})
-                    </p>
-                    <p className="text-neutral-300">
-                      {request.from_date} → {request.to_date}
-                    </p>
-                    {request.reason && (
-                      <p className="text-neutral-400">{request.reason}</p>
-                    )}
-                    {request.attachment_url && (
-                      <a
-                        href={request.attachment_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 inline-block text-xs font-medium text-blue-600 hover:underline"
-                      >
-                        View attachment
-                      </a>
-                    )}
-                    <p className="text-xs text-zinc-400">
-                      Submitted at {new Date(request.created_at).toLocaleString()}
-                    </p>
-                    {request.reviewed_at && (
-                      <p className="text-xs text-zinc-400">
-                        Reviewed at {new Date(request.reviewed_at).toLocaleString()}
+                  <div className="flex items-center justify-between flex-wrap gap-3">
+                    <div>
+                      <p className="font-medium text-foreground">{request.student_name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(request.created_at).toLocaleDateString()}
                       </p>
-                    )}
+                    </div>
+                    <StatusBadge status={request.status} />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${request.status === "approved" ? "bg-emerald-100 text-emerald-700" : request.status === "declined" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}
-                    >
-                      {request.status}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => updateStatus(request.id, "approved")}
-                      className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-500"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateStatus(request.id, "declined")}
-                      className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-500"
-                    >
-                      Decline
-                    </button>
-                  </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
-        </section>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            href="/admin/requests"
+            className="bg-card border border-border rounded-xl p-6 hover:bg-accent/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 transition-all duration-300">
+                <FileTextIcon className="text-primary" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">Manage Requests</h3>
+                <p className="text-sm text-muted-foreground">Review and approve leave requests</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            href="/admin/users"
+            className="bg-card border border-border rounded-xl p-6 hover:bg-accent/50 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 group shadow-sm"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-500/20 transition-all duration-300">
+                <UsersIcon className="text-blue-500" size={24} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground mb-1">Manage Users</h3>
+                <p className="text-sm text-muted-foreground">View users and appoint PCs</p>
+              </div>
+            </div>
+          </Link>
+        </div>
       </div>
     </div>
   );
