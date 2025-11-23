@@ -29,50 +29,50 @@
 }
 
 :root {
-  /* Base Colors - Selcore Light Corporate Theme */
-  --background: #ffffff;
-  --foreground: #1a1a1a;
+  /* Dark Theme Base Colors */
+  --background: #0f172a;
+  --foreground: #f8fafc;
 
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
 
-  --popover: #ffffff;
-  --popover-foreground: #1a1a1a;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
 
-  /* Navy Blue Primary */
-  --primary: #0f172a; 
+  /* Vibrant Primary - Purple/Blue Gradient Feel */
+  --primary: #8b5cf6;
   --primary-foreground: #ffffff;
 
-  /* Light Grey/Blue Secondary */
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
+  /* Secondary - Darker Slate */
+  --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
 
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
 
-  --accent: #f8fafc;
-  --accent-foreground: #0f172a;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
 
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
 
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #0f172a;
+  --border: #334155;
+  --input: #334155;
+  --ring: #8b5cf6;
 
   --radius: 0.5rem;
 
-  /* Stream Colors - Adjusted for Light Theme */
-  --stream-cse-from: #2563eb;
-  --stream-cse-to: #1d4ed8;
-  --stream-ece-from: #9333ea;
-  --stream-ece-to: #7e22ce;
-  --stream-eee-from: #d97706;
-  --stream-eee-to: #b45309;
-  --stream-mech-from: #dc2626;
-  --stream-mech-to: #b91c1c;
-  --stream-civil-from: #059669;
-  --stream-civil-to: #047857;
+  /* Stream Colors - Adjusted for Dark Theme (Neon/Vibrant) */
+  --stream-cse-from: #3b82f6;
+  --stream-cse-to: #2563eb;
+  --stream-ece-from: #a855f7;
+  --stream-ece-to: #9333ea;
+  --stream-eee-from: #f59e0b;
+  --stream-eee-to: #d97706;
+  --stream-mech-from: #ef4444;
+  --stream-mech-to: #dc2626;
+  --stream-civil-from: #10b981;
+  --stream-civil-to: #059669;
 }
 
 body {
@@ -81,135 +81,58 @@ body {
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Dark Mode */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--muted);
+  background: #334155;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+  background: #475569;
 }
 
-/* Glassmorphism Utilities - Refined for Light Theme */
+/* Glassmorphism Utilities - Dark Mode */
 .glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
-/* Smooth Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Text Gradients */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to right, #c084fc, #6366f1);
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes staggerFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes cardPulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.02);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
-.animate-stagger-in {
-  animation: staggerFadeIn 0.6s ease-out backwards;
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.6s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
+.text-gradient-blue {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to right, #60a5fa, #3b82f6);
 }
 
 /* Stream Gradient Backgrounds */
@@ -233,39 +156,20 @@ body {
   background: linear-gradient(135deg, var(--stream-civil-from), var(--stream-civil-to));
 }
 
-/* Modern Shadows */
+/* Modern Shadows / Glows */
 .shadow-glow {
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.3);
 }
 
 .shadow-glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
 }
 
-.shadow-glow-green {
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-}
-
-.shadow-glow-amber {
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-}
-
-/* Enhanced Card Hover Effects */
-@keyframes borderGlow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 10px rgba(var(--border-color), 0.3);
-  }
-
-  50% {
-    box-shadow: 0 0 20px rgba(var(--border-color), 0.6);
-  }
-}
-
-.card-hover-glow:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+/* Utilities */
+.container-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 /* Smooth Transitions */
@@ -273,4 +177,9 @@ body {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 200ms;
+}
+
+/* Remove transition for specific elements if needed to prevent layout shift jank */
+.no-transition {
+  transition: none !important;
 }
