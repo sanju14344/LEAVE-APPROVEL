@@ -46,16 +46,40 @@ export default function Hero() {
                     </div>
                 </AnimatedSection>
 
-                {/* Dashboard Mockup */}
-                <AnimatedSection delay={1.0} className="mt-16">
-                    <div className="relative max-w-5xl mx-auto">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20 blur-3xl" />
-                        <div className="relative glass-strong rounded-2xl p-2 shadow-2xl">
-                            <img
-                                src="/dashboard-mockup.png"
-                                alt="Leave Management Dashboard"
-                                className="w-full h-auto rounded-xl"
-                            />
+                {/* Abstract Stats/Features Display */}
+                <AnimatedSection delay={1.0} className="mt-20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                        {/* Stat Card 1 */}
+                        <div className="glass p-6 rounded-2xl border border-white/10 hover:border-purple-500/50 transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Fast Approvals</h3>
+                            <p className="text-gray-400">Streamlined multi-tier approval process</p>
+                        </div>
+
+                        {/* Stat Card 2 */}
+                        <div className="glass p-6 rounded-2xl border border-white/10 hover:border-blue-500/50 transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Real-time Alerts</h3>
+                            <p className="text-gray-400">Instant notifications for all updates</p>
+                        </div>
+
+                        {/* Stat Card 3 */}
+                        <div className="glass p-6 rounded-2xl border border-white/10 hover:border-pink-500/50 transition-all group">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-600 to-rose-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">Calendar View</h3>
+                            <p className="text-gray-400">Visual team availability tracking</p>
                         </div>
                     </div>
                 </AnimatedSection>
