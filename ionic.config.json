@@ -1,0 +1,7 @@
+{
+  "name": "LeaveApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
